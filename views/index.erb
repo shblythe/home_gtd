@@ -1,0 +1,64 @@
+<script type="text/javascript">
+function post(path, params, method) {
+  // from http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
+  method = method || "post"; // Set method to post by default if not specified.
+
+  // The rest of this code assumes you are not using a library.
+  // It can be made less wordy if you use one.
+  var form = document.createElement("form");
+  form.setAttribute("method", method);
+  form.setAttribute("action", path);
+
+  for(var key in params) {
+    if(params.hasOwnProperty(key)) {
+      var hiddenField = document.createElement("input");
+      hiddenField.setAttribute("type", "hidden");
+      hiddenField.setAttribute("name", key);
+      hiddenField.setAttribute("value", params[key]);
+
+      form.appendChild(hiddenField);
+    }
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function radioClick(id)
+{
+  console.log(id)
+  var e=document.getElementById("radio"+id);
+  console.log(e.checked)
+  post('/task/'+id,{dotted: e.checked},"post")
+}
+</script>
+
+<table>
+<% @tasks.each do |task| %>
+  <% if not task.done %>
+    <tr>
+      <td><input onclick="radioClick(<%= task.id %>)" id="radio<%= task.id%>" type="checkbox" <%= "checked" if task.dotted %>></td>
+      <td><%= "<del>" if task.done %>
+        <%= task.description %><%= "</del>" if task.done %></td>
+      <td>
+        <form method="post" action="/task/<%= task.id %>">
+          <input type="hidden" name="_method" value="delete">
+          <input type="submit" value="Done">
+        </form>
+      </td>
+      <td>
+        <form method="post" action="/task/<%= task.id %>">
+          <input type="hidden" name="_method" value="put">
+          <input type="hidden" name="action" value="donefornow">
+          <input type="submit" value="Done for now">
+        </form>
+      </td>
+    </tr>
+  <% end %>
+
+
+<% end %>
+</table>
+<form method="post" action="/task">
+  <input type="text" name="description" autofocus>
+</form>
