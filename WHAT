@@ -14,9 +14,9 @@ Negatives
 - rewriting is a bit laborious
 
 Online version:
-- obvious keyboard shortcuts
-- simple single list
-- filter by context
-- defer to reappear in future
-- hide irrelevant tasks (between dots)
-- active tasks buttons: complete-delete, did a bit - move to bottom, undot
+I obvious keyboard shortcuts
+D simple single list
+I filter by context
+I defer to reappear in future
+I hide irrelevant tasks (between dots)
+D active tasks buttons: complete-delete, did a bit - move to bottom, undot
