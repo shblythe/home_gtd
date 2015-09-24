@@ -53,6 +53,14 @@ post '/task' do
   redirect '/'
 end
 
+post '/job/cleardots' do
+  Task.each() do |task|
+    task.dotted=false
+    task.save
+  end
+  redirect '/'
+end
+
 delete '/task/:id' do
   @task=Task.get(params[:id])
   @task.done=true
