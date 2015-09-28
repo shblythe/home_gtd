@@ -40,9 +40,11 @@ function radioClick(id)
      lastdotted=index if task.dotted and not task.done
    end
 %>
+<% odd=true %>
 <% @tasks.each_with_index do |task,index| %>
   <% if (lastdotted==-1 or index>lastdotted or task.dotted) and not task.done %>
-    <tr>
+    <tr <%= "style=\"background-color:#c0c0c0;\"" if odd; %> >
+      <% odd=(not odd) %>
       <td><input onclick="radioClick(<%= task.id %>)" id="radio<%= task.id%>" type="checkbox" <%= "checked" if task.dotted %>></td>
       <td><%= "<del>" if task.done %>
         <%= task.description %><%= "</del>" if task.done %></td>
