@@ -37,7 +37,7 @@ function radioClick(id)
 <%
    lastdotted=-1
    @tasks.each_with_index do |task,index|
-     lastdotted=index if task.dotted
+     lastdotted=index if task.dotted and not task.done
    end
 %>
 <% @tasks.each_with_index do |task,index| %>
