@@ -47,7 +47,16 @@ function radioClick(id)
       <% odd=(not odd) %>
       <td><input onclick="radioClick(<%= task.id %>)" id="radio<%= task.id%>" type="checkbox" <%= "checked" if task.dotted %>></td>
       <td><%= "<del>" if task.done %>
-        <%= task.description %><%= "</del>" if task.done %></td>
+          <%= regex=/http:\/\/\S+/
+	      md=regex.match(task.description)
+	      if md
+		task.description[0..(md.begin(0)-1)]+"<a href=\"#{md[0]}\">link</a>"+
+			task.description[(md.end(0))..-1]
+	      else
+		task.description
+	      end
+	  %>
+	  <%= "</del>" if task.done %></td>
       <td>
         <form method="post" action="/task/<%= task.id %>">
           <input type="hidden" name="_method" value="delete">
