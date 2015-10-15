@@ -70,7 +70,14 @@ function radioClick(id)
           <input type="submit" value="Done for now">
         </form>
       </td>
-    </tr>
+      <td>
+        <form method="post" action="/task/<%= task.id %>">
+          <input type="hidden" name="_method" value="put">
+          <input type="hidden" name="action" value="defermin">
+          <input type="submit" value="Defer">
+        </form>
+      </td>
+     </tr>
   <% end %>
 
 

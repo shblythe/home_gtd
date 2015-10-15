@@ -13,6 +13,7 @@ class Task
   property :done, Boolean
   property :created_at, DateTime
   property :dotted, Boolean
+  property :deferred_until, DateTime, :default=>Time.now
 end
 
 # Perform basic sanity checks and initialize all relationships
@@ -21,12 +22,15 @@ DataMapper.finalize
 
 # Automatically create the post table
 Task.auto_upgrade!
-#Use following command instead for now, to empty the DB
+#Only use following command if there are existing records which don't have the
+#default value;
+#Task.update(:deferred_until=>Time.now)
+#Use following command instead for now, to empty the DB:
 #Task.auto_migrate!
 
 get '/' do
   # get all the tasks
-  @tasks = Task.all(:order => [ :id.asc ])
+  @tasks = Task.all(:deferred_until.lt=>Time.now, :order => [ :id.asc ])
   erb :index
 end
 
@@ -69,6 +73,7 @@ delete '/task/:id' do
 end
 
 put '/task/:id' do
+  puts params[:action]
   if (params[:action]=='donefornow')
     @task=Task.get(params[:id])
     @task.dotted=false
@@ -76,6 +81,14 @@ put '/task/:id' do
     attributes.delete(:id)
     @task.destroy
     Task.create(attributes)
+  elsif (params[:action]=='defermin')
+    puts 'deferring'
+    puts params[:id]
+    @task=Task.get(params[:id])
+    puts @task
+    @task.deferred_until=Time.now+60
+    @task.save
+    puts @task
   end
   redirect '/'
 end
