@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'data_mapper'
+require 'active_support/all'
 
 DataMapper::setup(:default,"sqlite3://#{Dir.pwd}/tasks.db")
 
@@ -81,12 +82,18 @@ put '/task/:id' do
     attributes.delete(:id)
     @task.destroy
     Task.create(attributes)
-  elsif (params[:action]=='defermin')
+  elsif (params[:action]=='defertomorrow')
     puts 'deferring'
     puts params[:id]
     @task=Task.get(params[:id])
     puts @task
-    @task.deferred_until=Time.now+60
+    # If it's before 4am, defer until 4am same day, otherwise 4am next day
+    t=Time.now
+    @task.deferred_until=t+4.hours-t.hour.hours-t.min.minutes-t.sec
+    if t.hour>=4
+      @task.deferred_until+=1.day
+    end
+    @task.deferred_until=1.day.from_now
     @task.save
     puts @task
   end
