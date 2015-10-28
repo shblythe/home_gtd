@@ -66,6 +66,14 @@ post '/job/cleardots' do
   redirect '/'
 end
 
+post '/job/clearpostponements' do
+  Task.each() do |task|
+    task.deferred_until=Time.now
+    task.save
+  end
+  redirect '/'
+end
+
 delete '/task/:id' do
   @task=Task.get(params[:id])
   @task.done=true
@@ -93,7 +101,6 @@ put '/task/:id' do
     if t.hour>=4
       @task.deferred_until+=1.day
     end
-    @task.deferred_until=1.day.from_now
     @task.save
     puts @task
   end
