@@ -23,29 +23,13 @@ function post(path, params, method) {
   document.body.appendChild(form);
   form.submit();
 }
-
-function radioClick(id)
-{
-  console.log(id)
-  var e=document.getElementById("radio"+id);
-  console.log(e.checked)
-  post('/task/'+id,{dotted: e.checked},"post")
-}
 </script>
 
 <table>
-<%
-   lastdotted=-1
-   @tasks.each_with_index do |task,index|
-     lastdotted=index if task.dotted and not task.done
-   end
-%>
 <% odd=true %>
-<% @tasks.each_with_index do |task,index| %>
-  <% if (lastdotted==-1 or index>lastdotted or task.dotted) and not task.done %>
+<% @tasks.each do |task| %>
     <tr <%= "style=\"background-color:#c0c0c0;\"" if odd; %> >
       <% odd=(not odd) %>
-      <td><input onclick="radioClick(<%= task.id %>)" id="radio<%= task.id%>" type="checkbox" <%= "checked" if task.dotted %>></td>
       <td><%= "<del>" if task.done %>
           <%= regex=/http[s]*:\/\/\S+/
 	      md=regex.match(task.description)
@@ -57,37 +41,25 @@ function radioClick(id)
 	      end
 	  %>
 	  <%= "</del>" if task.done %></td>
+      <td><%= task.deferred_until %></td>
+      <td>
+        <form method="post" action="/task/<%= task.id %>">
+          <input type="hidden" name="_method" value="put">
+          <input type="hidden" name="action" value="undefer">
+          <input type="submit" value="Un-defer">
+        </form>
+      </td>
       <td>
         <form method="post" action="/task/<%= task.id %>">
           <input type="hidden" name="_method" value="delete">
           <input type="submit" value="Done">
         </form>
       </td>
-      <td>
-        <form method="post" action="/task/<%= task.id %>">
-          <input type="hidden" name="_method" value="put">
-          <input type="hidden" name="action" value="donefornow">
-          <input type="submit" value="Done for now">
-        </form>
-      </td>
-      <td>
-        <form method="post" action="/task/<%= task.id %>">
-          <input type="hidden" name="_method" value="put">
-          <input type="hidden" name="action" value="defertomorrow">
-          <input type="submit" value="Tomorrow">
-        </form>
-      </td>
      </tr>
-  <% end %>
-
-
 <% end %>
 </table>
-<form method="post" action="/task">
-  <input type="text" name="description" autofocus>
-</form>
 <br/>
-<form method="post" action="/job/cleardots">
-  <input type="submit" value="Clear All Dots">
+<form method="post" action="/job/clearpostponements">
+  <input type="submit" value="Undo all postponements">
 </form>
-<a href="/postponed">View postponed</a>
+<a href="/">View all</a>

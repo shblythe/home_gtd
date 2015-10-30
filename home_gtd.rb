@@ -30,9 +30,15 @@ Task.auto_upgrade!
 #Task.auto_migrate!
 
 get '/' do
-  # get all the tasks
+  # get all the tasks not postponed
   @tasks = Task.all(:deferred_until.lt=>Time.now, :order => [ :id.asc ])
   erb :index
+end
+
+get '/postponed' do
+  # get all the tasks postponed
+  @tasks = Task.all(:deferred_until.gt=>Time.now, :order => [ :deferred_until.asc ])
+  erb :postponed
 end
 
 post '/task/:id' do
@@ -67,7 +73,8 @@ post '/job/cleardots' do
 end
 
 post '/job/clearpostponements' do
-  Task.each() do |task|
+  @tasks = Task.all(:deferred_until.gt=>Time.now, :order => [ :deferred_until.asc ])
+  @tasks.each() do |task|
     task.deferred_until=Time.now
     task.save
   end
@@ -90,6 +97,7 @@ put '/task/:id' do
     attributes.delete(:id)
     @task.destroy
     Task.create(attributes)
+    redirect '/'
   elsif (params[:action]=='defertomorrow')
     puts 'deferring'
     puts params[:id]
@@ -106,6 +114,11 @@ put '/task/:id' do
     @task.destroy
     Task.create(attributes)
     puts @task.deferred_until
+    redirect '/'
+  elsif (params[:action]=='undefer')
+    @task=Task.get(params[:id])
+    @task.deferred_until=Time.now
+    @task.save
+    redirect '/postponed'
   end
-  redirect '/'
 end
