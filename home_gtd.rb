@@ -94,15 +94,18 @@ put '/task/:id' do
     puts 'deferring'
     puts params[:id]
     @task=Task.get(params[:id])
-    puts @task
     # If it's before 4am, defer until 4am same day, otherwise 4am next day
     t=Time.now
     @task.deferred_until=t+4.hours-t.hour.hours-t.min.minutes-t.sec
     if t.hour>=4
       @task.deferred_until+=1.day
     end
-    @task.save
-    puts @task
+    @task.dotted=false
+    attributes=@task.attributes
+    attributes.delete(:id)
+    @task.destroy
+    Task.create(attributes)
+    puts @task.deferred_until
   end
   redirect '/'
 end
